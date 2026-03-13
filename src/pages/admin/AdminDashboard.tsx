@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { logoutAdmin } from '../../services/authService';
-import { Newspaper, GraduationCap, Building2, LogOut, Menu, X, Briefcase } from 'lucide-react';
+import { Newspaper, GraduationCap, Building2, LogOut, Menu, X, Briefcase, Bell, Users } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const AdminDashboard = () => {
@@ -19,6 +19,8 @@ const AdminDashboard = () => {
         { path: '/admin/dashboard/departments', label: 'Departments', icon: Building2 },
         { path: '/admin/dashboard/academics', label: 'Academics', icon: GraduationCap },
         { path: '/admin/dashboard/placements', label: 'Placements', icon: Briefcase },
+        { path: '/admin/dashboard/announcements', label: 'Announcements', icon: Bell },
+        { path: '/admin/dashboard/leadership', label: 'Leadership Messages', icon: Users },
     ];
 
     const isActive = (path: string) => location.pathname === path;

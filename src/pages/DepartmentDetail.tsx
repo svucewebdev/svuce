@@ -5,14 +5,16 @@ import { db } from '../config/firebase';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { departmentData } from '../data/departmentData';
-import { ChevronRight, Mail, Phone, BookOpen, Users, GraduationCap, User } from 'lucide-react';
+import { ChevronRight, Mail, Phone, BookOpen, Users, User, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import NotFound from './NotFound';
 
 interface FacultyMember {
     name: string;
     designation: string;
-    qualification: string;
+    mobile: string;
+    email: string;
+    profileLink: string;
 }
 
 const DepartmentDetail = () => {
@@ -116,19 +118,6 @@ const DepartmentDetail = () => {
                             </section>
                         </div>
 
-                        {/* Academic Programs */}
-                        <section className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                            <h2 className="text-2xl font-bold text-iare-blue mb-6 border-b pb-2 flex items-center">
-                                <BookOpen className="mr-3" /> Academic Programs
-                            </h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {department.programs.map((program: string, index: number) => (
-                                    <div key={index} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border-l-4 border-iare-blue">
-                                        <span className="font-semibold text-gray-800">{program}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
 
                         {/* Laboratories */}
                         <section className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
@@ -145,39 +134,6 @@ const DepartmentDetail = () => {
                             </div>
                         </section>
 
-                        {/* Faculty Details — Full Section in Main Content */}
-                        {faculty.length > 0 && (
-                            <section className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                                <h2 className="text-2xl font-bold text-iare-blue mb-6 border-b pb-2 flex items-center">
-                                    <Users className="mr-3" /> Faculty Details
-                                </h2>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-iare-blue text-white">
-                                                <th className="px-4 py-3 text-sm font-semibold rounded-tl-lg">S.No</th>
-                                                <th className="px-4 py-3 text-sm font-semibold">Name</th>
-                                                <th className="px-4 py-3 text-sm font-semibold">Designation</th>
-                                                <th className="px-4 py-3 text-sm font-semibold rounded-tr-lg">Qualification</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {faculty.map((member, index) => (
-                                                <tr
-                                                    key={index}
-                                                    className={`border-b border-gray-100 hover:bg-blue-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                                                >
-                                                    <td className="px-4 py-3 text-gray-500 text-sm">{index + 1}</td>
-                                                    <td className="px-4 py-3 font-medium text-gray-800">{member.name}</td>
-                                                    <td className="px-4 py-3 text-gray-600 text-sm">{member.designation}</td>
-                                                    <td className="px-4 py-3 text-gray-600 text-sm">{member.qualification}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
-                        )}
 
                     </div>
 
@@ -206,6 +162,7 @@ const DepartmentDetail = () => {
                             )}
                         </div>
 
+
                         {/* Contact Info */}
                         <div className="bg-iare-blue text-white p-6 rounded-xl shadow-lg">
                             <h3 className="text-lg font-bold mb-4 border-b border-blue-400 pb-2">Department Contact</h3>
@@ -221,35 +178,77 @@ const DepartmentDetail = () => {
                             </div>
                         </div>
 
-                        {/* Faculty Details — Sidebar Summary Card */}
+                        {/* Academic Programs */}
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                                <Users className="h-5 w-5 mr-2 text-iare-blue" /> Faculty Details
+                                <BookOpen className="h-5 w-5 mr-2 text-iare-blue" /> Academic Programs
                             </h3>
-                            {faculty.length === 0 ? (
-                                <p className="text-gray-500 text-sm italic">Faculty details will be updated soon.</p>
-                            ) : (
-                                <ul className="space-y-3">
-                                    {faculty.map((member, i) => (
-                                        <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-blue-50 transition-colors">
-                                            <div className="h-8 w-8 rounded-full bg-iare-blue text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                                                {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-gray-800 text-sm leading-tight">{member.name}</p>
-                                                <p className="text-gray-500 text-xs">{member.designation}</p>
-                                                <p className="text-gray-400 text-xs flex items-center gap-1 mt-0.5">
-                                                    <GraduationCap className="h-3 w-3" /> {member.qualification}
-                                                </p>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
+                            <ul className="space-y-2">
+                                {department.programs.map((program: string, index: number) => (
+                                    <li key={index} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 hover:bg-blue-50 transition-colors">
+                                        <div className="h-2 w-2 rounded-full bg-iare-blue flex-shrink-0"></div>
+                                        <span className="text-sm font-medium text-gray-700">{program}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
+
+
 
                     </div>
                 </div>
+
+                {/* Faculty Details — Full Width */}
+                {faculty.length > 0 && (
+                    <section className="bg-white mt-12 p-8 rounded-xl shadow-sm border border-gray-100">
+                        <h2 className="text-2xl font-bold text-iare-blue mb-6 border-b pb-2 flex items-center">
+                            <Users className="mr-3" /> Faculty Details
+                        </h2>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-iare-blue text-white">
+                                        <th className="px-4 py-3 text-sm font-semibold rounded-tl-lg">S.No</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Name</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Designation</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Mobile</th>
+                                        <th className="px-4 py-3 text-sm font-semibold">Email</th>
+                                        <th className="px-4 py-3 text-sm font-semibold rounded-tr-lg">Profile</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {faculty.map((member, index) => (
+                                        <tr
+                                            key={index}
+                                            className={`border-b border-gray-100 hover:bg-blue-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                                        >
+                                            <td className="px-4 py-3 text-gray-500 text-sm">{index + 1}</td>
+                                            <td className="px-4 py-3 font-medium text-gray-800">{member.name}</td>
+                                            <td className="px-4 py-3 text-gray-600 text-sm">{member.designation}</td>
+                                            <td className="px-4 py-3 text-gray-600 text-sm">
+                                                {member.mobile ? (
+                                                    <a href={`tel:${member.mobile}`} className="hover:text-iare-blue transition-colors">{member.mobile}</a>
+                                                ) : '—'}
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-600 text-sm">
+                                                {member.email ? (
+                                                    <a href={`mailto:${member.email}`} className="hover:text-iare-blue transition-colors break-all">{member.email}</a>
+                                                ) : '—'}
+                                            </td>
+                                            <td className="px-4 py-3 text-sm">
+                                                {member.profileLink ? (
+                                                    <a href={member.profileLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-iare-blue hover:underline">
+                                                        <ExternalLink className="w-3.5 h-3.5" /> View
+                                                    </a>
+                                                ) : '—'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                )}
             </div>
             <Footer />
         </div>

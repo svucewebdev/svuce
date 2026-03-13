@@ -5,21 +5,21 @@ import { db } from '../config/firebase';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import {
-    Building, Zap, Settings, Radio, Code, FlaskConical,
-    ArrowRight, BookOpen, Microscope, Globe, Cpu, Wrench, Atom
+    HardHat, Lightbulb, Wrench, Wifi, Terminal, Microscope,
+    Server, Briefcase, Monitor, Atom, ArrowRight
 } from 'lucide-react';
 
 // Icon map: maps a department id or icon name to a Lucide icon
 const iconMap: Record<string, React.ReactNode> = {
-    civil: <Building className="w-10 h-10" />,
-    eee: <Zap className="w-10 h-10" />,
-    mechanical: <Settings className="w-10 h-10" />,
-    ece: <Radio className="w-10 h-10" />,
-    cse: <Code className="w-10 h-10" />,
-    sciences: <FlaskConical className="w-10 h-10" />,
-    it: <Cpu className="w-10 h-10" />,
-    mba: <Globe className="w-10 h-10" />,
-    mca: <BookOpen className="w-10 h-10" />,
+    civil: <HardHat className="w-10 h-10" />,
+    eee: <Lightbulb className="w-10 h-10" />,
+    mechanical: <Wrench className="w-10 h-10" />,
+    ece: <Wifi className="w-10 h-10" />,
+    cse: <Terminal className="w-10 h-10" />,
+    sciences: <Microscope className="w-10 h-10" />,
+    it: <Server className="w-10 h-10" />,
+    mba: <Briefcase className="w-10 h-10" />,
+    mca: <Monitor className="w-10 h-10" />,
     default: <Atom className="w-10 h-10" />,
 };
 
@@ -112,14 +112,14 @@ const Departments = () => {
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-iare-blue"></div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
                         {departments.map((dept) => (
                             <Link
                                 key={dept.id}
                                 to={`/departments/${dept.id}`}
-                                className="group"
+                                className="group flex"
                             >
-                                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-iare-blue transition-all duration-300 h-full flex flex-col">
+                                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-iare-blue transition-all duration-300 flex flex-col h-full">
                                     {/* Header */}
                                     <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 border-b border-gray-200">
                                         <div className="flex items-start justify-between mb-4">
@@ -138,8 +138,8 @@ const Departments = () => {
                                     </div>
 
                                     {/* Content */}
-                                    <div className="p-6 flex-grow flex flex-col">
-                                        <p className="text-gray-600 leading-relaxed mb-6 flex-grow">
+                                    <div className="p-6 flex flex-col flex-grow">
+                                        <p className="text-gray-600 leading-relaxed mb-6 line-clamp-3 overflow-hidden">
                                             {dept.description || dept.tagline || 'Learn more about this department.'}
                                         </p>
                                         <div className="flex items-center text-iare-blue font-semibold group-hover:text-blue-700 transition-colors">
