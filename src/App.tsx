@@ -14,6 +14,7 @@ import CampusLife from "./pages/CampusLife";
 import AboutUs from "./pages/AboutUs";
 import News from "./pages/News";
 import Academics from './pages/Academics';
+import Facilities from './pages/Facilities';
 import Contact from './pages/Contact';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -22,6 +23,8 @@ import DepartmentManager from './pages/admin/DepartmentManager';
 import AcademicsManager from './pages/admin/AcademicsManager';
 import PlacementsManager from './pages/admin/PlacementsManager';
 import ProtectedRoute from './components/ProtectedRoute';
+import AnnouncementsManager from './pages/admin/AnnouncementsManager';
+import PrincipalManager from './pages/admin/PrincipalManager';
 import DataMigration from './pages/DataMigration';
 import AnimationProvider from './components/AnimationProvider';
 import ScrollToTop from './components/ScrollToTop';
@@ -44,6 +47,7 @@ const App = () => (
               <Route path="/departments" element={<Departments />} />
               <Route path="/departments/:id" element={<DepartmentDetail />} />
               <Route path="/academics" element={<Academics />} />
+              <Route path="/facilities" element={<Facilities />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/campus-life" element={<CampusLife />} />
               <Route path="/about-us" element={<AboutUs />} />
@@ -55,6 +59,8 @@ const App = () => (
                 <Route path="departments" element={<DepartmentManager />} />
                 <Route path="academics" element={<AcademicsManager />} />
                 <Route path="placements" element={<PlacementsManager />} />
+                <Route path="announcements" element={<AnnouncementsManager />} />
+                <Route path="leadership" element={<PrincipalManager />} />
               </Route>
 
               {/* Data Migration Route (one-time use) */}

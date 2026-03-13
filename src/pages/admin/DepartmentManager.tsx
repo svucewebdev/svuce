@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 interface FacultyMember {
     name: string;
     designation: string;
-    qualification: string;
+    mobile: string;
+    email: string;
+    profileLink: string;
 }
 
 interface DepartmentData {
@@ -49,7 +51,7 @@ const emptyDept = (id: string = '', name: string = ''): DepartmentData => ({
     contact: { email: '', phone: '' },
 });
 
-const emptyFaculty = (): FacultyMember => ({ name: '', designation: '', qualification: '' });
+const emptyFaculty = (): FacultyMember => ({ name: '', designation: '', mobile: '', email: '', profileLink: '' });
 
 const DepartmentManager = () => {
     const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
@@ -446,11 +448,11 @@ const DepartmentManager = () => {
                                     <p className="text-gray-400 text-sm italic text-center py-4 bg-gray-50 rounded-lg">No faculty added yet.</p>
                                 ) : (
                                     <div className="space-y-3">
-                                        <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_auto] gap-3 text-xs font-semibold text-gray-500 uppercase tracking-wide px-1">
-                                            <span>Name</span><span>Designation</span><span>Qualification</span><span></span>
+                                        <div className="hidden md:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-3 text-xs font-semibold text-gray-500 uppercase tracking-wide px-1">
+                                            <span>Name</span><span>Designation</span><span>Mobile</span><span>Email</span><span>Profile Link</span><span></span>
                                         </div>
                                         {deptData.faculty.map((member, index) => (
-                                            <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center bg-gray-50 p-3 rounded-lg">
+                                            <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-3 items-center bg-gray-50 p-3 rounded-lg">
                                                 <div>
                                                     <label className="block text-xs text-gray-500 mb-1 md:hidden">Name</label>
                                                     <Input value={member.name} onChange={(e) => updateFaculty(index, 'name', e.target.value)} placeholder="Dr. Faculty Name" />
@@ -460,8 +462,16 @@ const DepartmentManager = () => {
                                                     <Input value={member.designation} onChange={(e) => updateFaculty(index, 'designation', e.target.value)} placeholder="Associate Professor" />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs text-gray-500 mb-1 md:hidden">Qualification</label>
-                                                    <Input value={member.qualification} onChange={(e) => updateFaculty(index, 'qualification', e.target.value)} placeholder="Ph.D (IIT Madras)" />
+                                                    <label className="block text-xs text-gray-500 mb-1 md:hidden">Mobile</label>
+                                                    <Input value={member.mobile} onChange={(e) => updateFaculty(index, 'mobile', e.target.value)} placeholder="+91 9876543210" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-500 mb-1 md:hidden">Email</label>
+                                                    <Input value={member.email} onChange={(e) => updateFaculty(index, 'email', e.target.value)} placeholder="faculty@svuce.edu.in" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-500 mb-1 md:hidden">Profile Link</label>
+                                                    <Input value={member.profileLink} onChange={(e) => updateFaculty(index, 'profileLink', e.target.value)} placeholder="https://..." />
                                                 </div>
                                                 <Button size="sm" variant="outline" onClick={() => removeFaculty(index)}>
                                                     <Trash2 className="w-4 h-4 text-red-500" />
