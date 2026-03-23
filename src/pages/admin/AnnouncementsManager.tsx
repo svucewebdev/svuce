@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-type TabKey = 'circulars' | 'admissions' | 'events';
+type TabKey = 'circulars' | 'admissions' | 'events' | 'mous';
 
 interface AnnouncementItem {
     id: string;
@@ -29,6 +29,7 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
     { key: 'circulars', label: 'Circulars', icon: FileText },
     { key: 'admissions', label: 'Admissions', icon: GraduationCap },
     { key: 'events', label: 'Events', icon: Bell },
+    { key: 'mous', label: 'MOUs', icon: FileText },
 ];
 
 const AnnouncementsManager = () => {
