@@ -24,9 +24,9 @@ const Index = () => {
   const [latestNews, setLatestNews] = useState<any[]>([]);
   const [loadingNews, setLoadingNews] = useState(true);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [activeTab, setActiveTab] = useState<'circulars' | 'admissions' | 'events'>('circulars');
-  const [announcements, setAnnouncements] = useState<{ circulars: any[]; admissions: any[]; events: any[] }>({
-    circulars: [], admissions: [], events: []
+  const [activeTab, setActiveTab] = useState<'circulars' | 'admissions' | 'events' | 'mous'>('circulars');
+  const [announcements, setAnnouncements] = useState<{ circulars: any[]; admissions: any[]; events: any[]; mous: any[] }>({
+    circulars: [], admissions: [], events: [], mous: []
   });
   const [loadingAnn, setLoadingAnn] = useState(true);
 
@@ -75,12 +75,13 @@ const Index = () => {
           })
           .slice(0, 5);
       };
-      const [circulars, admissions, events] = await Promise.all([
+      const [circulars, admissions, events, mous] = await Promise.all([
         fetchCol('circulars'),
         fetchCol('admissions'),
         fetchCol('events'),
+        fetchCol('mous'),
       ]);
-      setAnnouncements({ circulars, admissions, events });
+      setAnnouncements({ circulars, admissions, events, mous });
     } catch (e) {
       console.error('Error fetching announcements:', e);
     } finally {
@@ -253,6 +254,7 @@ const Index = () => {
                 { key: 'circulars', label: 'Circulars', icon: FileText },
                 { key: 'admissions', label: 'Admissions', icon: Admission },
                 { key: 'events', label: 'Events', icon: Bell },
+                { key: 'mous', label: 'MOUs', icon: Briefcase },
               ] as const).map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
@@ -289,6 +291,7 @@ const Index = () => {
                         {activeTab === 'circulars' && <FileText className="w-5 h-5 text-iare-blue" />}
                         {activeTab === 'admissions' && <Admission className="w-5 h-5 text-iare-blue" />}
                         {activeTab === 'events' && <Bell className="w-5 h-5 text-iare-blue" />}
+                        {activeTab === 'mous' && <Briefcase className="w-5 h-5 text-iare-blue" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-800 leading-snug">{item.title}</p>
