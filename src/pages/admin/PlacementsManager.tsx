@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { Plus, Edit, Trash2, Save, X, Building2, Quote } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Building2, Quote, Upload, Download, FileSpreadsheet } from 'lucide-react';
+import * as xlsx from 'xlsx';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +46,10 @@ const PlacementsManager = () => {
     const [placementForm, setPlacementForm] = useState({ studentName: '', company: '', package: '', role: '', department: '', year: '', imageUrl: '' });
     const [editingPlacementId, setEditingPlacementId] = useState<string | null>(null);
     const [showPlacementForm, setShowPlacementForm] = useState(false);
+
+    const [showBulkUpload, setShowBulkUpload] = useState(false);
+    const [excelData, setExcelData] = useState<any[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
 
     const [testimonials, setTestimonials] = useState<any[]>([]);
     const [testimonialForm, setTestimonialForm] = useState({ studentName: '', company: '', quote: '', imageUrl: '', year: '' });
@@ -104,6 +109,68 @@ const PlacementsManager = () => {
     };
 
     const resetPlacementForm = () => { setPlacementForm({ studentName: '', company: '', package: '', role: '', department: '', year: '', imageUrl: '' }); setEditingPlacementId(null); setShowPlacementForm(false); };
+
+    const handleDownloadTemplate = () => {
+        const ws = xlsx.utils.json_to_sheet([{
+            'Student Name': '',
+            'Company': '',
+            'Role': '',
+            'Package': '',
+            'Department': '',
+            'Year': '',
+            'Image URL (Optional)': ''
+        }]);
+        const wb = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb, ws, "Placements Template");
+        xlsx.writeFile(wb, "Placements_Upload_Template.xlsx");
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const bstr = evt.target?.result;
+            const wb = xlsx.read(bstr, { type: 'binary' });
+            const wsname = wb.SheetNames[0];
+            const ws = wb.Sheets[wsname];
+            const data = xlsx.utils.sheet_to_json(ws);
+            setExcelData(data);
+        };
+        reader.readAsBinaryString(file);
+    };
+
+    const handleBulkSave = async () => {
+        setIsUploading(true);
+        try {
+            let count = 0;
+            for (const row of excelData) {
+                if (!row['Student Name'] || !row['Company']) continue;
+                
+                const placementData = {
+                    studentName: row['Student Name'] || '',
+                    company: row['Company'] || '',
+                    role: row['Role'] || '',
+                    package: String(row['Package'] || ''),
+                    department: row['Department'] || '',
+                    year: String(row['Year'] || ''),
+                    imageUrl: row['Image URL'] || row['Image URL (Optional)'] || ''
+                };
+                
+                await addDoc(collection(db, 'placements'), placementData);
+                count++;
+            }
+            alert(`Successfully uploaded ${count} placements!`);
+            setExcelData([]);
+            setShowBulkUpload(false);
+            await fetchPlacements();
+        } catch (error) {
+            console.error(error);
+            alert('Error during bulk upload');
+        }
+        setIsUploading(false);
+    };
 
     const fetchTestimonials = async () => {
         const s = await getDocs(query(collection(db, 'testimonials'), orderBy('year', 'desc')));
@@ -215,8 +282,83 @@ const PlacementsManager = () => {
                 <TabsContent value="placements" className="space-y-4">
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-semibold">Placement Records</h2>
-                        {!showPlacementForm && <Button onClick={() => setShowPlacementForm(true)} className="bg-iare-blue"><Plus className="w-4 h-4 mr-2" />Add</Button>}
+                        <div className="flex gap-2">
+                            {!showPlacementForm && !showBulkUpload && (
+                                <>
+                                    <Button onClick={() => setShowBulkUpload(true)} className="bg-green-600 hover:bg-green-700">
+                                        <Upload className="w-4 h-4 mr-2" />Bulk Upload
+                                    </Button>
+                                    <Button onClick={() => setShowPlacementForm(true)} className="bg-iare-blue">
+                                        <Plus className="w-4 h-4 mr-2" />Add
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     </div>
+                    {showBulkUpload && (
+                        <div className="bg-white rounded-lg shadow p-6 space-y-6 border-2 border-green-100">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2 text-green-700">
+                                    <FileSpreadsheet className="w-6 h-6" />
+                                    <h3 className="text-lg font-semibold">Bulk Upload Placements via Excel</h3>
+                                </div>
+                                <Button variant="ghost" onClick={() => { setShowBulkUpload(false); setExcelData([]); }}><X className="w-5 h-5" /></Button>
+                            </div>
+
+                            <div className="bg-green-50 p-4 rounded-md border border-green-100 flex justify-between items-center">
+                                <div>
+                                    <h4 className="font-medium text-green-800">1. Download Template</h4>
+                                    <p className="text-sm text-green-600 mt-1">Download the Excel template and fill in your student placement data.</p>
+                                </div>
+                                <Button variant="outline" className="border-green-600 text-green-700 hover:bg-green-100" onClick={handleDownloadTemplate}>
+                                    <Download className="w-4 h-4 mr-2" />Download Template
+                                </Button>
+                            </div>
+
+                            <div className="bg-blue-50 p-4 rounded-md border border-blue-100 space-y-4">
+                                <div>
+                                    <h4 className="font-medium text-blue-800">2. Upload Filled Template</h4>
+                                    <p className="text-sm text-blue-600 mt-1">Select your completed .xlsx file to preview the data before saving.</p>
+                                </div>
+                                <Input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} className="bg-white border-blue-200" />
+                            </div>
+
+                            {excelData.length > 0 && (
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <h4 className="font-medium">3. Preview Data ({excelData.length} rows found)</h4>
+                                        <Button onClick={handleBulkSave} disabled={isUploading} className="bg-iare-blue">
+                                            <Save className="w-4 h-4 mr-2" />{isUploading ? 'Uploading...' : 'Save All to Database'}
+                                        </Button>
+                                    </div>
+                                    <div className="overflow-x-auto max-h-60 border rounded-md">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                                                <tr>
+                                                    <th className="px-4 py-2">Student Name</th>
+                                                    <th className="px-4 py-2">Company</th>
+                                                    <th className="px-4 py-2">Role</th>
+                                                    <th className="px-4 py-2">Package</th>
+                                                    <th className="px-4 py-2">Dept</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {excelData.map((row, idx) => (
+                                                    <tr key={idx} className="border-b bg-white hover:bg-gray-50">
+                                                        <td className="px-4 py-2">{row['Student Name']}</td>
+                                                        <td className="px-4 py-2">{row['Company']}</td>
+                                                        <td className="px-4 py-2">{row['Role']}</td>
+                                                        <td className="px-4 py-2">{row['Package']}</td>
+                                                        <td className="px-4 py-2">{row['Department']}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     {showPlacementForm && (
                         <div className="bg-white rounded-lg shadow p-6 space-y-4">
                             <div className="flex justify-between"><h3 className="text-lg font-semibold">{editingPlacementId ? 'Edit' : 'Add'} Placement</h3><Button variant="ghost" onClick={resetPlacementForm}><X className="w-5 h-5" /></Button></div>
