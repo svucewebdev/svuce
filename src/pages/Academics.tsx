@@ -12,7 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const Academics = () => {
     const [activeTab, setActiveTab] = useState("courses");
     const [resources, setResources] = useState<any>({});
+    const [selectedRegulation, setSelectedRegulation] = useState<string>("All");
     const [loading, setLoading] = useState(true);
+
+    const defaultRegulations = ['All', 'R25','R23', 'R20',];
 
     useEffect(() => {
         fetchResources();
@@ -40,44 +43,113 @@ const Academics = () => {
         }
     };
 
-    // Helper function to render resources for any category
+    const matchesRegulation = (resource: any, reg: string) => {
+        if (reg === 'All') return true;
+        const target = reg.toLowerCase();
+        if (resource.regulation && resource.regulation.trim()) {
+            return resource.regulation.toLowerCase() === target;
+        }
+        // Smart fallback for existing resources without explicit regulation field
+        const year = reg.replace(/\D/g, '');
+        const fullYear = year ? `20${year}` : '';
+        const title = (resource.title || '').toLowerCase();
+        const desc = (resource.description || '').toLowerCase();
+        return title.includes(target) || (fullYear && title.includes(fullYear)) || desc.includes(target) || (fullYear && desc.includes(fullYear));
+    };
+
+    // Helper function to render resources for any category with regulation filter
     const renderResources = (categoryKey: string) => {
         const categoryResources = resources[categoryKey] || [];
 
         if (categoryResources.length > 0) {
+            // Find any additional custom regulations in this category's data
+            const customRegulations = Array.from(
+                new Set(
+                    categoryResources
+                        .map((r: any) => r.regulation)
+                        .filter((reg: string | undefined): reg is string => Boolean(reg && !defaultRegulations.includes(reg)))
+                )
+            ) as string[];
+            const availableRegulations = [...defaultRegulations, ...customRegulations];
+
+            const filteredResources = categoryResources.filter((r: any) => matchesRegulation(r, selectedRegulation));
+
             return (
-                <div className="grid grid-cols-1 gap-4">
-                    {categoryResources.map((resource: any) => (
-                        <Card key={resource.id} className="hover:shadow-lg transition-shadow">
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-iare-blue">{resource.title}</CardTitle>
-                                    <div className="flex gap-2">
-                                        {resource.semester && (
-                                            <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                                {resource.semester}
-                                            </span>
+                <div className="space-y-4">
+                    {/* Regulation Filter Buttons */}
+                    <div className="bg-white p-3 rounded-lg border flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 mr-1">
+                            Regulation:
+                        </span>
+                        {availableRegulations.map((reg) => (
+                            <Button
+                                key={reg}
+                                size="sm"
+                                variant={selectedRegulation === reg ? "default" : "outline"}
+                                className={`text-xs h-8 px-3 transition-all ${
+                                    selectedRegulation === reg
+                                        ? "bg-iare-blue text-white shadow-sm font-semibold hover:bg-blue-900"
+                                        : "bg-white hover:bg-blue-50 text-gray-700 border-gray-200"
+                                }`}
+                                onClick={() => setSelectedRegulation(reg)}
+                            >
+                                {reg === 'All' ? 'All Regulations' : reg}
+                            </Button>
+                        ))}
+                    </div>
+
+                    {filteredResources.length === 0 ? (
+                        <div className="text-center py-10 bg-white rounded-lg border border-dashed border-gray-300 text-gray-500">
+                            <p className="text-base font-medium">No resources found for {selectedRegulation} regulations.</p>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedRegulation('All')}
+                                className="mt-3 text-iare-blue border-iare-blue hover:bg-blue-50"
+                            >
+                                Show All Regulations
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-4">
+                            {filteredResources.map((resource: any) => (
+                                <Card key={resource.id} className="hover:shadow-md transition-shadow">
+                                    <CardHeader>
+                                        <div className="flex items-start justify-between gap-4">
+                                            <CardTitle className="text-iare-blue text-lg">{resource.title}</CardTitle>
+                                            <div className="flex flex-wrap gap-2 flex-shrink-0">
+                                                {resource.regulation && (
+                                                    <span className="px-2.5 py-1 rounded text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">
+                                                        {resource.regulation}
+                                                    </span>
+                                                )}
+                                                {resource.semester && (
+                                                    <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                                        {resource.semester}
+                                                    </span>
+                                                )}
+                                                {resource.department && (
+                                                    <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
+                                                        {resource.department}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <CardDescription>{resource.description}</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {resource.fileUrl && resource.fileUrl !== '#' && (
+                                            <Button variant="outline" size="sm" asChild>
+                                                <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
+                                                    <Download className="mr-2 h-4 w-4" /> View/Download
+                                                </a>
+                                            </Button>
                                         )}
-                                        {resource.department && (
-                                            <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
-                                                {resource.department}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <CardDescription>{resource.description}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {resource.fileUrl && resource.fileUrl !== '#' && (
-                                    <Button variant="outline" asChild>
-                                        <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
-                                            <Download className="mr-2 h-4 w-4" /> View/Download
-                                        </a>
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
-                    ))}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
                 </div>
             );
         }
@@ -97,25 +169,7 @@ const Academics = () => {
             content: (
                 <div className="space-y-6">
                     {resources.courses && resources.courses.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-4">
-                            {resources.courses.map((resource: any) => (
-                                <Card key={resource.id} className="hover:shadow-lg transition-shadow">
-                                    <CardHeader>
-                                        <CardTitle className="text-iare-blue">{resource.title}</CardTitle>
-                                        <CardDescription>{resource.description}</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        {resource.fileUrl && resource.fileUrl !== '#' && (
-                                            <Button variant="outline" asChild>
-                                                <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer">
-                                                    <Download className="mr-2 h-4 w-4" /> View Details
-                                                </a>
-                                            </Button>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
+                        renderResources('courses')
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <Card>

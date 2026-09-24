@@ -31,7 +31,7 @@ const Header = () => {
                 <Facebook size={14} />
                 <span>Facebook</span>
               </a>
-              <a href="https://www.instagram.com/svuce/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-iare-yellow transition-colors">
+              <a href="https://www.instagram.com/svucesv/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-iare-yellow transition-colors">
                 <Instagram size={14} />
                 <span>Instagram</span>
               </a>
@@ -39,7 +39,7 @@ const Header = () => {
                 <Twitter size={14} />
                 <span>Twitter</span>
               </a>
-              <a href="https://www.youtube.com/user/SVUCE" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-iare-yellow transition-colors">
+              <a href="https://youtube.com/@svucestudentversion5669?si=dWxLhQPfxmidQleJ" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-iare-yellow transition-colors">
                 <Youtube size={14} />
                 <span>YouTube</span>
               </a>

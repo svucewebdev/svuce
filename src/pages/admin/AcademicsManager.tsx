@@ -14,6 +14,7 @@ interface AcademicResource {
     fileUrl: string;
     semester?: string;
     department?: string;
+    regulation?: string;
 }
 
 const AcademicsManager = () => {
@@ -26,9 +27,11 @@ const AcademicsManager = () => {
         fileUrl: '',
         semester: '',
         department: '',
+        regulation: '',
     });
     const [editingId, setEditingId] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] = useState('courses');
+    const [selectedRegulationFilter, setSelectedRegulationFilter] = useState('All');
     const [loading, setLoading] = useState(false);
 
     const categories = [
@@ -39,6 +42,8 @@ const AcademicsManager = () => {
         { value: 'syllabus', label: 'Syllabus' },
         { value: 'timetables', label: 'Time Tables' },
     ];
+
+    const regulationOptions = ['R25','R23', 'R20', ];
 
     useEffect(() => {
         fetchResources();
@@ -76,7 +81,10 @@ const AcademicsManager = () => {
     };
 
     const handleEdit = (item: AcademicResource) => {
-        setCurrentResource(item);
+        setCurrentResource({
+            ...item,
+            regulation: item.regulation || '',
+        });
         setEditingId(item.id);
         setIsEditing(true);
     };
@@ -100,10 +108,25 @@ const AcademicsManager = () => {
             fileUrl: '',
             semester: '',
             department: '',
+            regulation: '',
         });
         setEditingId(null);
         setIsEditing(false);
     };
+
+    const matchesRegulation = (item: AcademicResource, reg: string) => {
+        if (reg === 'All') return true;
+        if (item.regulation && item.regulation.toLowerCase() === reg.toLowerCase()) {
+            return true;
+        }
+        const year = reg.replace(/\D/g, '');
+        const fullYear = year ? `20${year}` : '';
+        const title = (item.title || '').toLowerCase();
+        const desc = (item.description || '').toLowerCase();
+        return title.includes(reg.toLowerCase()) || (fullYear && title.includes(fullYear)) || desc.includes(reg.toLowerCase()) || (fullYear && desc.includes(fullYear));
+    };
+
+    const filteredResources = resources.filter(item => matchesRegulation(item, selectedRegulationFilter));
 
     return (
         <div className="space-y-6">
@@ -117,17 +140,37 @@ const AcademicsManager = () => {
                 )}
             </div>
 
-            <div className="bg-white rounded-lg shadow p-4">
-                <label className="block text-sm font-medium mb-2">Filter by Category</label>
-                <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                    {categories.map((cat) => (
-                        <option key={cat.value} value={cat.value}>{cat.label}</option>
-                    ))}
-                </select>
+            <div className="bg-white rounded-lg shadow p-4 space-y-4">
+                <div>
+                    <label className="block text-sm font-medium mb-2">Filter by Category</label>
+                    <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    >
+                        {categories.map((cat) => (
+                            <option key={cat.value} value={cat.value}>{cat.label}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-2">Filter by Regulation</label>
+                    <div className="flex flex-wrap gap-2">
+                        {['All', ...regulationOptions].map((reg) => (
+                            <Button
+                                key={reg}
+                                type="button"
+                                size="sm"
+                                variant={selectedRegulationFilter === reg ? "default" : "outline"}
+                                className={selectedRegulationFilter === reg ? "bg-iare-blue text-white" : "text-gray-700"}
+                                onClick={() => setSelectedRegulationFilter(reg)}
+                            >
+                                {reg}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {isEditing && (
@@ -154,12 +197,50 @@ const AcademicsManager = () => {
                         </select>
                     </div>
 
+                    {/* Regulation Selection Buttons & Input */}
+                    <div className="p-4 bg-blue-50/60 rounded-lg border border-blue-100 space-y-3">
+                        <label className="block text-sm font-semibold text-gray-800">
+                            Regulation / Scheme (e.g. R20, R23)
+                        </label>
+                        <div className="flex flex-wrap gap-2 items-center">
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant={!currentResource.regulation ? "default" : "outline"}
+                                className={!currentResource.regulation ? "bg-iare-blue text-white" : "bg-white text-gray-700"}
+                                onClick={() => setCurrentResource({ ...currentResource, regulation: '' })}
+                            >
+                                None
+                            </Button>
+                            {regulationOptions.map((reg) => (
+                                <Button
+                                    key={reg}
+                                    type="button"
+                                    size="sm"
+                                    variant={currentResource.regulation === reg ? "default" : "outline"}
+                                    className={currentResource.regulation === reg ? "bg-iare-blue text-white shadow-sm" : "bg-white text-gray-700"}
+                                    onClick={() => setCurrentResource({ ...currentResource, regulation: reg })}
+                                >
+                                    {reg}
+                                </Button>
+                            ))}
+                        </div>
+                        <div className="pt-1">
+                            <Input
+                                value={currentResource.regulation || ''}
+                                onChange={(e) => setCurrentResource({ ...currentResource, regulation: e.target.value.toUpperCase() })}
+                                placeholder="Or enter custom regulation (e.g., R20, R23)"
+                                className="bg-white"
+                            />
+                        </div>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium mb-2">Title</label>
                         <Input
                             value={currentResource.title}
                             onChange={(e) => setCurrentResource({ ...currentResource, title: e.target.value })}
-                            placeholder="Resource title"
+                            placeholder="Resource title (e.g. B.Tech Regulations -2020 (R20))"
                         />
                     </div>
 
@@ -201,7 +282,7 @@ const AcademicsManager = () => {
                         </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 pt-2">
                         <Button onClick={handleSave} disabled={loading} className="bg-iare-blue">
                             <Save className="w-4 h-4 mr-2" />
                             {loading ? 'Saving...' : 'Save'}
@@ -214,38 +295,58 @@ const AcademicsManager = () => {
             )}
 
             <div className="grid grid-cols-1 gap-4">
-                {resources.map((item) => (
-                    <div key={item.id} className="bg-white rounded-lg shadow p-6 flex justify-between items-start">
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                                <FileText className="w-5 h-5 text-iare-blue" />
-                                <h3 className="text-lg font-semibold">{item.title}</h3>
-                                {item.semester && (
-                                    <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                        {item.semester}
-                                    </span>
-                                )}
-                                {item.department && (
-                                    <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
-                                        {item.department}
-                                    </span>
-                                )}
-                            </div>
-                            <p className="text-gray-600 mb-2">{item.description}</p>
-                            <a href={item.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-iare-blue hover:underline">
-                                View Document →
-                            </a>
-                        </div>
-                        <div className="flex gap-2 ml-4">
-                            <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
-                                <Edit className="w-4 h-4" />
+                {filteredResources.length === 0 ? (
+                    <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+                        <p>No resources found for the selected filter.</p>
+                        {selectedRegulationFilter !== 'All' && (
+                            <Button
+                                variant="link"
+                                onClick={() => setSelectedRegulationFilter('All')}
+                                className="text-iare-blue mt-2"
+                            >
+                                Reset regulation filter
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDelete(item.id)}>
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                            </Button>
-                        </div>
+                        )}
                     </div>
-                ))}
+                ) : (
+                    filteredResources.map((item) => (
+                        <div key={item.id} className="bg-white rounded-lg shadow p-6 flex justify-between items-start">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                    <FileText className="w-5 h-5 text-iare-blue flex-shrink-0" />
+                                    <h3 className="text-lg font-semibold">{item.title}</h3>
+                                    {item.regulation && (
+                                        <span className="px-2.5 py-1 rounded text-xs font-semibold bg-purple-100 text-purple-800 border border-purple-200">
+                                            {item.regulation}
+                                        </span>
+                                    )}
+                                    {item.semester && (
+                                        <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                            {item.semester}
+                                        </span>
+                                    )}
+                                    {item.department && (
+                                        <span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">
+                                            {item.department}
+                                        </span>
+                                    )}
+                                </div>
+                                <p className="text-gray-600 mb-2">{item.description}</p>
+                                <a href={item.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-iare-blue hover:underline">
+                                    View Document →
+                                </a>
+                            </div>
+                            <div className="flex gap-2 ml-4">
+                                <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
+                                    <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => handleDelete(item.id)}>
+                                    <Trash2 className="w-4 h-4 text-red-600" />
+                                </Button>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

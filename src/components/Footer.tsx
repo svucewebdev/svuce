@@ -12,19 +12,22 @@ const Footer = () => {
             <h3 className="text-xl font-medium mb-4 border-b border-iare-yellow pb-2">Contact Us</h3>
             <div className="flex items-start mb-2">
               <MapPin size={18} className="mt-1 mr-2 flex-shrink-0" />
-              <p className='uppercase'>
+              <a href="https://www.google.com/maps/place/Sri+Venkateshwara+University+College+of+Engineering/@13.626998,79.397067,15z/data=!4m6!3m5!1s0x3a4d4b6b271b4ffd:0x30859fdc6c661028!8m2!3d13.6269984!4d79.3970675!16s%2Fm%2F026pb7y?hl=en&entry=ttu&g_ep=EgoyMDI2MDgyNi4wIKXMDSoASAFQAw%3D%3D"><p className='uppercase'>
                 Sri Venkateswara University College of Engineering<br />
                 Tirupati - 517502<br />
                 Andhra Pradesh, India
-              </p>
+              </p></a>
+              
             </div>
             <div className="flex items-center mb-2">
               <Mail size={18} className="mr-2 flex-shrink-0" />
-              <p>principal_svuce2003@yahoo.co.in</p>
+              <a href="mailto:principal_svuce2003@yahoo.co.in"><p>principal_svuce2003@yahoo.co.in</p></a>
+              
             </div>
             <div className="flex items-center">
               <Phone size={18} className="mr-2 flex-shrink-0" />
-              <p>+91-877-2289561</p>
+              <a href="tel:8772289561">  <p>+91-877-2289561</p></a>
+            
             </div>
           </div>
           <div>

@@ -5,6 +5,7 @@ import { db } from '../config/firebase';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import NewsPushNotification from '../components/NewsPushNotification';
 import {
   ArrowRight,
   Calendar,
@@ -534,6 +535,8 @@ const Index = () => {
   return (
 
     <div className="flex flex-col min-h-screen">
+
+      <NewsPushNotification />
 
       <Header />
 
@@ -1871,7 +1874,7 @@ const Index = () => {
 
 
                       <Link
-                        to="/news"
+                        to={`/news?id=${item.id}`}
                         className="
                           text-iare-blue
                           font-medium

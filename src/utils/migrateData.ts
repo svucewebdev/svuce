@@ -68,6 +68,7 @@ export const migrateDataToFirebase = async () => {
                 fileUrl: '#',
                 semester: '',
                 department: 'All',
+                regulation: 'R20',
             },
             {
                 category: 'calendar',
@@ -76,6 +77,7 @@ export const migrateDataToFirebase = async () => {
                 fileUrl: '#',
                 semester: '',
                 department: 'All',
+                regulation: 'R23',
             },
             {
                 category: 'regulations',
@@ -84,6 +86,7 @@ export const migrateDataToFirebase = async () => {
                 fileUrl: '#',
                 semester: '',
                 department: 'All',
+                regulation: 'R20',
             },
             {
                 category: 'syllabus',
@@ -92,6 +95,7 @@ export const migrateDataToFirebase = async () => {
                 fileUrl: '#',
                 semester: '',
                 department: 'CSE',
+                regulation: 'R20',
             },
             {
                 category: 'timetables',
@@ -100,6 +104,7 @@ export const migrateDataToFirebase = async () => {
                 fileUrl: '#',
                 semester: 'Semester 1',
                 department: 'All',
+                regulation: 'R23',
             },
         ];
 
